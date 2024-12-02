@@ -1,0 +1,170 @@
+model:
+  target: cldm.cldm.ControlLDM
+  base_learning_rate: 1e-5
+  params:
+    ckpt_path: /mnt/hdd1/wengtaohan/stable_diffusion/control_sd21_ini.ckpt
+    sd_locked: False
+    linear_start: 0.00085
+    linear_end: 0.0120
+    num_timesteps_cond: 1
+    log_every_t: 200
+    timesteps: 1000
+    first_stage_key: "jpg"
+    cond_stage_key: "txt"
+    control_key: "hint"
+    image_size: 32
+    channels: 4
+    cond_stage_trainable: false
+    conditioning_key: crossattn
+    monitor: val/loss_simple_ema
+    scale_factor: 0.18215
+    use_ema: False
+    only_mid_control: False
+    ignore_keys: ['first_stage_model']
+
+    scheduler_config: # 10000 warmup steps
+      target: ldm.lr_scheduler.LambdaLinearScheduler
+      params:
+        warm_up_steps: [ 1000 ]
+        cycle_lengths: [ 20000 ] # incredibly large number to prevent corner cases
+        f_start: [ 1.e-6 ]
+        f_max: [ 1. ]
+        f_min: [ 0.001 ]
+
+    control_stage_config:
+      target: cldm.cldm.ControlNet
+      params:
+        use_checkpoint: True
+        image_size: 32 # unused
+        in_channels: 4
+        hint_channels: 3
+        model_channels: 320
+        attention_resolutions: [ 4, 2, 1 ]
+        num_res_blocks: 2
+        channel_mult: [ 1, 2, 4, 4 ]
+        num_head_channels: 64 # need to fix for flash-attn
+        use_spatial_transformer: True
+        use_linear_in_transformer: True
+        transformer_depth: 1
+        context_dim: 1024
+        legacy: False
+
+    unet_config:
+      target: cldm.cldm.ControlledUnetModel
+      params:
+        apply_lora: False
+        lora_config:
+          r: 16
+          lora_alpha: 32
+          lora_dropout: 0.2
+
+        use_checkpoint: True
+        image_size: 32 # unused
+        in_channels: 4
+        out_channels: 4
+        model_channels: 320
+        attention_resolutions: [ 4, 2, 1 ]
+        num_res_blocks: 2
+        channel_mult: [ 1, 2, 4, 4 ]
+        num_head_channels: 64 # need to fix for flash-attn
+        use_spatial_transformer: True
+        use_linear_in_transformer: True
+        transformer_depth: 1
+        context_dim: 1024
+        legacy: False
+
+    first_stage_config:
+      target: ldm.models.autoencoder_decoupling.AutoencoderKL
+      params:
+        ckpt_path: /mnt/hdd1/wengtaohan/Code/latent-diffusion-main/logs/2024-11-26T11-19-59_ge_ae_sd/checkpoints/epoch=000138.ckpt
+        load_form_sd: False
+        embed_dim: 4
+        monitor: val/rec_loss
+
+        apply_lora: True
+        lora_r: 16
+        lora_alpha: 32
+        lora_dropout: 0.2
+
+        encoder_lora: False
+        decoder_lora: True
+        encoder_freeze: True
+        decoder_freeze: True
+
+        ddconfig:
+          #attn_type: "vanilla-xformers"
+          double_z: true
+          z_channels: 4
+          resolution: 256
+          in_channels: 3
+          out_ch: 3
+          ch: 128
+          ch_mult:
+            - 1
+            - 2
+            - 4
+            - 4
+          num_res_blocks: 2
+          attn_resolutions: [ ]
+          dropout: 0.0
+
+        lossconfig:
+          target: ldm.modules.losses.LPIPSWithDiscriminator
+          params:
+            disc_start: 50001
+            kl_weight: 0.000001
+            disc_weight: 0.5
+
+    cond_stage_config:
+      target: ldm.modules.encoders.modules.FrozenOpenCLIPEmbedder
+      params:
+        freeze: True
+        layer: "penultimate"
+
+data:
+  target: main.DataModuleFromConfig
+  params:
+    batch_size: 1
+    wrap: true
+    train:
+      target: ldm.data.control_CTA.ControlWrappedDataset
+      params:
+        wrap_config:
+          target: ldm.data.dcm_CTA.CTAHeart
+          params:
+            data_root: /mnt/hdd1/wengtaohan/Dataset/GE_BIG_split/train
+            yaml_path: /mnt/hdd1/wengtaohan/Dataset/GE_BIG_split/yaml/train.yaml
+            load_modality_list: [ 'contrast', 'non_contrast' ]
+            windows: [-1000, 1000]
+            size: 256
+            load_format: slice
+            out_like_image: True
+            flip_p: 0
+#        flip_p: 0.5
+    validation:
+      target: ldm.data.control_CTA.ControlWrappedDataset
+      params:
+        wrap_config:
+          target: ldm.data.dcm_CTA.CTAHeart
+          params:
+            data_root: /mnt/hdd1/wengtaohan/Dataset/GE_BIG_split/test
+            yaml_path: /mnt/hdd1/wengtaohan/Dataset/GE_BIG_split/yaml/test.yaml
+            load_modality_list: [ 'contrast', 'non_contrast' ]
+            windows: [ -1000, 1000 ]
+            size: 256
+            load_format: slice
+            out_like_image: True
+            flip_p: 0
+lightning:
+  callbacks:
+    image_logger:
+      target: main.ImageLogger
+      params:
+        batch_frequency: 1000
+        max_images: 8
+        increase_log_steps: True
+
+  trainer:
+    benchmark: True
+    accumulate_grad_batches: 1
+    strategy: ddp
