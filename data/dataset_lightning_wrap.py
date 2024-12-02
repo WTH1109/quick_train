@@ -2,7 +2,7 @@ import pytorch_lightning as pl
 
 from functools import partial
 from torch.utils.data import DataLoader, Dataset
-from utils.instance_from_config import instantiate_from_config
+from utils.config_utils import instantiate_from_config
 
 class DataModuleFromConfig(pl.LightningDataModule):
     """

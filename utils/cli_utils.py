@@ -1,4 +1,5 @@
 import argparse
+import os.path
 
 import yaml
 from torch.utils.hipify.hipify_python import str2bool
@@ -15,7 +16,9 @@ def main_opt_get(args=None):
 
     # Custom args setting
     if read_opt.name == '':
-        read_opt.name = read_opt.config.split('.')[-2]
+        read_opt.name = os.path.basename(read_opt.config).split('.')[-2]
+
+    read_opt.config_name = os.path.basename(read_opt.config).split('.')[-2]
 
     return read_opt
 
