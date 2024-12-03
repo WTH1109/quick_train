@@ -1,6 +1,8 @@
 lightning:
   callbacks:
   trainer:
+    precision: 16
+    accelerator: gpu
     benchmark: True
     accumulate_grad_batches: 1
     strategy: ddp
