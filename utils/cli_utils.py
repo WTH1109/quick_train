@@ -40,9 +40,15 @@ def main_get_parser():
     parser = argparse.ArgumentParser(description="main training parser")
 
     parser.add_argument('-n', '--name', type=str, default='', help='save model name')
+    parser.add_argument('-m', '--model', type=str, default=None, help='model name')
+    parser.add_argument('-b', '--batch_size', type=int, default=None, help='batch_size')
+    parser.add_argument('-e', '--epoch', type=int, default=500, help='epoch number')
+    parser.add_argument('-lr', '--learning_rate', type=float, default=None, help='learning rate')
+    parser.add_argument('-p', '--drop_out', type=float, default=None, help='drop out')
     parser.add_argument('-t', '--test', type=str2bool, default=False, help='choose testing the model.')
     parser.add_argument('-g', '--gpus', type=str, default='0,', help='select the gpus to use.')
     parser.add_argument('-r', '--resume', type=str, default=None, help='last.ckpt path')
+    parser.add_argument('-l', '--log', type=bool, default=False, help='log the stream output')
 
     parser.add_argument('--debug', type=str, default=False,
                         help='quickly run one epoch to validate the correctness of the code.')

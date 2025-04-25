@@ -1,0 +1,30 @@
+model:
+  target: model.classic_model.C3D.C3DRegressionModel
+#  params:
+#    learning_rate: 1e-7
+
+
+data:
+  target: data.dataset_lightning_wrap_sample.DataModuleFromConfig
+  params:
+    batch_size: 64
+    wrap: true
+    sample: true
+    train:
+      target: data.dataset_custom.Lung.lung_video_clip.FullVideoDataset
+      params:
+        video_dir: /media/ps/data/home/wengtaohan/Dataset/video_dataset/rm_word
+        mode: train
+        target_length: &frame_num 240
+    test:
+      target: data.dataset_custom.Lung.lung_video_clip.FullVideoDataset
+      params:
+        video_dir: /media/ps/data/home/wengtaohan/Dataset/video_dataset/rm_word
+        mode: test
+        target_length: *frame_num
+    validation:
+      target: data.dataset_custom.Lung.lung_video_clip.FullVideoDataset
+      params:
+        video_dir: /media/ps/data/home/wengtaohan/Dataset/video_dataset/rm_word
+        mode: test
+        target_length: *frame_num

@@ -10,7 +10,9 @@ class MainFileManage:
             self.save_log_name = now + '_' + name
             self.save_log_path = os.path.join(log_dir, config_name, self.save_log_name)
             self.save_tensorboard_log_path = os.path.join(self.save_log_path, 'tensorboard')
+            self.save_metrics_path = os.path.join(self.save_log_path, 'metrics')
             self.save_checkpoints_path = os.path.join(self.save_log_path, 'checkpoints')
+            self.save_logstream_path = os.path.join(self.save_log_path, 'logstream')
             self.save_config_path = os.path.join(self.save_log_path, 'configs')
 
             self.project_config_name = now + '-project.yaml'
@@ -24,13 +26,19 @@ class MainFileManage:
             self.save_log_path, _ = os.path.split(self.save_checkpoints_path)
             _, self.save_log_name = os.path.split(self.save_log_path)
             self.save_tensorboard_log_path = os.path.join(self.save_log_path, 'tensorboard')
+            self.save_metrics_path = os.path.join(self.save_log_path, 'metrics')
+            self.save_logstream_path = os.path.join(self.save_log_path, 'logstream')
             self.save_config_path = os.path.join(self.save_log_path, 'configs')
 
     def create_log_dir(self):
         os.makedirs(self.save_log_path, exist_ok=True)
         os.makedirs(self.save_tensorboard_log_path, exist_ok=True)
+        os.makedirs(self.save_metrics_path, exist_ok=True)
+        os.makedirs(self.save_logstream_path, exist_ok=True)
         os.makedirs(self.save_checkpoints_path, exist_ok=True)
         os.makedirs(self.save_config_path, exist_ok=True)
+
+
 
     def save_model_config(self):
         base_config = self.base_config

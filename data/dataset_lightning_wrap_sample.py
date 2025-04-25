@@ -1,7 +1,9 @@
 import pytorch_lightning as pl
 
 from functools import partial
-from torch.utils.data import DataLoader, Dataset
+
+import torch
+from torch.utils.data import DataLoader, Dataset, WeightedRandomSampler
 from utils.config_utils import instantiate_from_config
 
 class DataModuleFromConfig(pl.LightningDataModule):
@@ -11,7 +13,7 @@ class DataModuleFromConfig(pl.LightningDataModule):
     """
     def __init__(self, batch_size, train=None, validation=None, test=None, predict=None,
                  wrap=False, num_workers=None, shuffle_test_loader=False, use_worker_init_fn=False,
-                 shuffle_val_dataloader=False):
+                 shuffle_val_dataloader=False, sample=False):
         """
         :param batch_size:
         :param train: train dataset config, format as following:
@@ -33,9 +35,10 @@ class DataModuleFromConfig(pl.LightningDataModule):
         super().__init__()
         self.batch_size = batch_size
         self.dataset_configs = dict()
-        self.num_workers = num_workers if num_workers is not None else batch_size
+        self.num_workers = 60
         # self.num_workers = 0
         self.use_worker_init_fn = use_worker_init_fn
+        self.sample = sample
         if train is not None:
             self.dataset_configs["train"] = train
             self.train_dataloader = self._train_dataloader
@@ -64,8 +67,15 @@ class DataModuleFromConfig(pl.LightningDataModule):
     def _train_dataloader(self):
         print('***********************************************************')
         print('batch size is setting: %d'%self.batch_size)
-        return DataLoader(self.datasets["train"], batch_size=self.batch_size,
-                          num_workers=self.num_workers, shuffle=True)
+        if self.sample:
+            assert hasattr(self.datasets["train"].data, 'weight_list')
+            weights = torch.DoubleTensor(self.datasets["train"].data.weight_list)
+            sampler = WeightedRandomSampler(weights, num_samples=len(weights), replacement=True)
+            return DataLoader(self.datasets["train"], batch_size=self.batch_size,
+                              num_workers=self.num_workers, shuffle=False, sampler=sampler)
+        else:
+            return DataLoader(self.datasets["train"], batch_size=self.batch_size,
+                              num_workers=self.num_workers, shuffle=True)
 
     def _val_dataloader(self, shuffle=False):
         return DataLoader(self.datasets["validation"],

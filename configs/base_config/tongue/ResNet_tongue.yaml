@@ -1,0 +1,33 @@
+model:
+  target: model.classic_model.ResNet.ResNetClassifier
+  params:
+    num_classes: 2
+    pretrained: True
+    learning_rate: 0.0001
+
+data:
+  target: data.dataset_lightning_wrap.DataModuleFromConfig
+  params:
+    batch_size: 8
+    wrap: true
+    train:
+      target: data.dataset_custom.tongue.tongue_IgA.TongueDataset
+      params:
+        data_dir: /media/ps/data-ssd/home-ssd/wengtaohan/Dataset/tongue/tongue_IgA
+        split: train
+        data_phase: tongue_cutting
+        image_format: png
+    validation:
+      target: data.dataset_custom.tongue.tongue_IgA.TongueDataset
+      params:
+        data_dir: /media/ps/data-ssd/home-ssd/wengtaohan/Dataset/tongue/tongue_IgA
+        split: test
+        data_phase: tongue_cutting
+        image_format: png
+    test:
+      target: data.dataset_custom.tongue.tongue_IgA.TongueDataset
+      params:
+        data_dir: /media/ps/data-ssd/home-ssd/wengtaohan/Dataset/tongue/tongue_IgA
+        split: test
+        data_phase: tongue_cutting
+        image_format: png

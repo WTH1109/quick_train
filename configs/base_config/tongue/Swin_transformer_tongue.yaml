@@ -1,0 +1,36 @@
+model:
+  target: model.classic_model.SwinTransformer.SwinTransformerClassifier
+  params:
+    num_classes: 2
+    pretrained: True
+    learning_rate: 0.00005
+
+data:
+  target: data.dataset_lightning_wrap.DataModuleFromConfig
+  params:
+    batch_size: 4
+    wrap: true
+    train:
+      target: data.dataset_custom.tongue.tongue_IgA.TongueDataset
+      params:
+        data_dir: /media/ps/data-ssd/home-ssd/wengtaohan/Dataset/tongue/tongue_IgA
+        split: train
+        resize_size: 224
+        data_phase: tongue_cutting
+        image_format: png
+    validation:
+      target: data.dataset_custom.tongue.tongue_IgA.TongueDataset
+      params:
+        data_dir: /media/ps/data-ssd/home-ssd/wengtaohan/Dataset/tongue/tongue_IgA
+        split: test
+        resize_size: 224
+        data_phase: tongue_cutting
+        image_format: png
+    test:
+      target: data.dataset_custom.tongue.tongue_IgA.TongueDataset
+      params:
+        data_dir: /media/ps/data-ssd/home-ssd/wengtaohan/Dataset/tongue/tongue_IgA
+        split: test
+        resize_size: 224
+        data_phase: tongue_cutting
+        image_format: png

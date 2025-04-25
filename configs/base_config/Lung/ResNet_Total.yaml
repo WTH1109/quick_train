@@ -13,15 +13,15 @@ data:
     train:
       target: data.dataset_custom.Lung.ultrasound_lung.LungDataset
       params:
-        data_dir: /mnt/Dataset/Lung/process_data/step3_total_data_prepare
+        data_dir: /mnt/Dataset/Lung/process_data/total_data
         split: train
     validation:
       target: data.dataset_custom.Lung.ultrasound_lung.LungDataset
       params:
-        data_dir: /mnt/Dataset/Lung/process_data/step3_total_data_prepare
+        data_dir: /mnt/Dataset/Lung/process_data/total_data
         split: test
     test:
       target: data.dataset_custom.Lung.ultrasound_lung.LungDataset
       params:
-        data_dir: /mnt/Dataset/Lung/process_data/step3_total_data_prepare
+        data_dir: /mnt/Dataset/Lung/process_data/total_data
         split: test

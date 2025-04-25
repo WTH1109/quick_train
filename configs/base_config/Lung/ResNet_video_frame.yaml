@@ -8,20 +8,20 @@ model:
 data:
   target: data.dataset_lightning_wrap.DataModuleFromConfig
   params:
-    batch_size: 4
+    batch_size: 16
     wrap: true
     train:
       target: data.dataset_custom.Lung.ultrasound_lung.LungDataset
       params:
-        data_dir: /mnt/Dataset/Lung/process_data/cutting_data
+        data_dir: /media/ps/data-ssd/home-ssd/wengtaohan/Dataset/Lung/process_data/video_frame_data
         split: train
     validation:
       target: data.dataset_custom.Lung.ultrasound_lung.LungDataset
       params:
-        data_dir: /mnt/Dataset/Lung/process_data/cutting_data
+        data_dir: /media/ps/data-ssd/home-ssd/wengtaohan/Dataset/Lung/process_data/video_frame_data
         split: test
     test:
       target: data.dataset_custom.Lung.ultrasound_lung.LungDataset
       params:
-        data_dir: /mnt/Dataset/Lung/process_data/cutting_data
+        data_dir: /media/ps/data-ssd/home-ssd/wengtaohan/Dataset/Lung/process_data/video_frame_data
         split: test

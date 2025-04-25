@@ -1,0 +1,30 @@
+model:
+  target: model.classic_model.C3D_LSTM.C3DLstmLighting
+  params:
+    num_classes: &frame_num 240
+    pool_type: 'weighted'
+    learning_rate: 1e-7
+
+data:
+  target: data.dataset_lightning_wrap.DataModuleFromConfig
+  params:
+    batch_size: 2
+    wrap: true
+    train:
+      target: data.dataset_custom.Lung.lung_video.FullVideoDataset
+      params:
+        video_dir: /mnt/Dataset/video_dataset/rm_word
+        mode: train
+        target_length: *frame_num
+    test:
+      target: data.dataset_custom.Lung.lung_video.FullVideoDataset
+      params:
+        video_dir: /mnt/Dataset/video_dataset/rm_word
+        mode: test
+        target_length: *frame_num
+    validation:
+      target: data.dataset_custom.Lung.lung_video.FullVideoDataset
+      params:
+        video_dir: /mnt/Dataset/video_dataset/rm_word
+        mode: test
+        target_length: *frame_num
