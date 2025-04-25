@@ -9,6 +9,8 @@ config_name=(configs/base_config/tongue_merge/ResNet_tongue_seg.yaml)
 GPUS=(1 2 3)          # 可用GPU列表
 MAX_JOBS_PER_GPU=1    # 每张GPU上最大并行任务数
 
+rm -rf tmp_seg && mkdir tmp_seg
+
 # 生成参数队列
 param_queue=()
 for p in "${p_values[@]}"; do
@@ -46,7 +48,7 @@ run_job() {
 
 # 初始化GPU任务计数器文件
 for gpu in "${GPUS[@]}"; do
-  counter_file="/tmp/gpu_${gpu}_jobs"
+  counter_file="tmp_seg/gpu_${gpu}_jobs"
   echo 0 > "$counter_file"
   # 设置退出时清理计数器文件
   trap "rm -f $counter_file" EXIT
@@ -60,7 +62,7 @@ total_jobs=${#param_queue[@]}
 while (( job_idx < total_jobs )); do
   for gpu in "${GPUS[@]}"; do
     # 原子读取当前任务数
-    counter_file="/tmp/gpu_${gpu}_jobs"
+    counter_file="tmp_seg/gpu_${gpu}_jobs"
     current_jobs=$(flock -x "$counter_file" -c "cat $counter_file")
 
     if (( current_jobs < MAX_JOBS_PER_GPU )); then
