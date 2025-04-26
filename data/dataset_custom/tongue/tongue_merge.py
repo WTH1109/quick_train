@@ -11,18 +11,21 @@ import torchvision.transforms as transforms
 
 
 class TongueDataset(Dataset):
-    def __init__(self, data_dir, data_type='img', split='train', data_phase='tongue_seg', image_format='JPG',resize_size=512, sample_num=6):
+    def __init__(self, data_dir, data_type='img', split='train', data_phase='tongue_seg', collection='synchronize',
+                 data_list=None, image_format='JPG', resize_size=512, sample_num=6):
         """
         Args:
             data_dir (str): 数据根目录，包含 train 和 test 文件夹
             split (str): 数据集分割 ('train' 或 'test')
         """
+        if data_list is None:
+            data_list = ['no_IgA', 'IgA', 'merge', 'secondary']
         self.data_dir = data_dir
         self.split = split
         self.resize_size = resize_size
         self.data_type = data_type
 
-        self.label_map = {'no_Iga': 0, 'no_IgA': 0, 'IgA': 1, 'merge': 1}
+        self.label_map = {'no_IgA': 0, 'IgA': 1, 'merge': 1, 'secondary': 1}
 
         self.json_file = os.path.join(self.data_dir, 'dataset_info.json')
 
@@ -35,7 +38,20 @@ class TongueDataset(Dataset):
         with open(self.json_file, 'r') as f:
             self.dataset_info = json.load(f)
 
-        self.data_info = self.dataset_info[self.split]
+        self.data_info_cp = self.dataset_info[self.split]
+
+        self.data_info = []
+
+        for data_item in self.data_info_cp:
+            data_retain = True
+            if collection == 'synchronize':
+                if data_item['collection'] == 'follow':
+                    data_retain = False
+            if data_item['label'] not in data_list:
+                data_retain = False
+            if data_retain:
+                self.data_info.append(data_item)
+
 
         # 根据数据集分割选择不同的transform
         self.transform = self.get_transform()

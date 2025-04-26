@@ -34,6 +34,10 @@ if __name__ == '__main__':
         base_config['data']['params']['batch_size'] = opt.batch_size
     if opt.learning_rate is not None:
         base_config['model']['params']['learning_rate'] = opt.learning_rate
+    if opt.data_dir is not None:
+        base_config['data']['params']['train']['data_dir'] = opt.data_dir
+        base_config['data']['params']['validation']['data_dir'] = opt.data_dir
+        base_config['data']['params']['test']['data_dir'] = opt.data_dir
 
     batch_size = base_config['data']['params']['batch_size']
     learning_rate = ("{:.0e}".format(base_config['model']['params']['learning_rate'])

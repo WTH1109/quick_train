@@ -43,6 +43,7 @@ def main_get_parser():
     parser.add_argument('-m', '--model', type=str, default=None, help='model name')
     parser.add_argument('-b', '--batch_size', type=int, default=None, help='batch_size')
     parser.add_argument('-e', '--epoch', type=int, default=500, help='epoch number')
+    parser.add_argument('-d', '--data_dir', type=str, default=None, help='data dir')
     parser.add_argument('-lr', '--learning_rate', type=float, default=None, help='learning rate')
     parser.add_argument('-p', '--drop_out', type=float, default=None, help='drop out')
     parser.add_argument('-t', '--test', type=str2bool, default=False, help='choose testing the model.')
