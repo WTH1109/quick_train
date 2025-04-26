@@ -43,7 +43,7 @@ run_job() {
     -lr "$lr" \
     -b "$b" \
     -e "1000" \
-    -d /media/ps/data-ssd/home-ssd/wengtaohan/Dataset/tongue/tongue_IgA \
+    -d /media/ps/data-ssd/home-ssd/wengtaohan/Dataset/tongue/merge/merge_seg_fine_grain \
     --log "True"
 }
 
