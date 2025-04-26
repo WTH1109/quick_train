@@ -7,7 +7,7 @@ b_values=(8 16 32)
 model_name=(resnet18 resnet34 resnet50 efficientnet_b0 efficientnet_b4 inception_v3)
 config_name=(configs/base_config/tongue_merge/ResNet_tongue_seg.yaml)
 GPUS=(1 2 3)          # 可用GPU列表
-MAX_JOBS_PER_GPU=1    # 每张GPU上最大并行任务数
+MAX_JOBS_PER_GPU=2    # 每张GPU上最大并行任务数
 
 rm -rf tmp_seg && mkdir tmp_seg
 
